@@ -10,7 +10,10 @@
 #include "capstone2llvmir/arm64/arm64_impl.h"
 #include "capstone2llvmir/mips/mips_impl.h"
 #include "capstone2llvmir/powerpc/powerpc_impl.h"
+#include "capstone2llvmir/riscv/riscv_impl.h"
 #include "capstone2llvmir/x86/x86_impl.h"
+
+#include <iostream>
 
 namespace retdec {
 namespace capstone2llvmir {
@@ -54,6 +57,12 @@ std::unique_ptr<Capstone2LlvmIrTranslator> Capstone2LlvmIrTranslator::createArch
 			if (basic == CS_MODE_64) return createPpc64(m, extra);
 			break;
 		}
+		case CS_ARCH_RISCV:
+		{
+			if (basic == CS_MODE_RISCV32) return createRiscv32(m, extra);
+			if (basic == CS_MODE_RISCV64) return createRiscv64(m, extra);
+			break;
+		}
 		case CS_ARCH_SPARC:
 		{
 			return createSparc(m, extra);
@@ -80,21 +89,21 @@ std::unique_ptr<Capstone2LlvmIrTranslator> Capstone2LlvmIrTranslator::createArm(
 		llvm::Module* m,
 		cs_mode extra)
 {
-	return std::make_unique<Capstone2LlvmIrTranslatorArm_impl>(m, CS_MODE_ARM, extra);
+	return nullptr; // std::make_unique<Capstone2LlvmIrTranslatorArm_impl>(m, CS_MODE_ARM, extra);
 }
 
 std::unique_ptr<Capstone2LlvmIrTranslator> Capstone2LlvmIrTranslator::createThumb(
 		llvm::Module* m,
 		cs_mode extra)
 {
-	return std::make_unique<Capstone2LlvmIrTranslatorArm_impl>(m, CS_MODE_THUMB, extra);
+	return nullptr; //std::make_unique<Capstone2LlvmIrTranslatorArm_impl>(m, CS_MODE_THUMB, extra);
 }
 
 std::unique_ptr<Capstone2LlvmIrTranslator> Capstone2LlvmIrTranslator::createArm64(
 		llvm::Module* m,
 		cs_mode extra)
 {
-	return std::make_unique<Capstone2LlvmIrTranslatorArm64_impl>(m, CS_MODE_ARM, extra);
+	return nullptr; //std::make_unique<Capstone2LlvmIrTranslatorArm64_impl>(m, CS_MODE_ARM, extra);
 }
 
 std::unique_ptr<Capstone2LlvmIrTranslator> Capstone2LlvmIrTranslator::createMips32(
@@ -129,42 +138,56 @@ std::unique_ptr<Capstone2LlvmIrTranslator> Capstone2LlvmIrTranslator::createX86_
 		llvm::Module* m,
 		cs_mode extra)
 {
-	return std::make_unique<Capstone2LlvmIrTranslatorX86_impl>(m, CS_MODE_16, extra);
+	return nullptr; //std::make_unique<Capstone2LlvmIrTranslatorX86_impl>(m, CS_MODE_16, extra);
 }
 
 std::unique_ptr<Capstone2LlvmIrTranslator> Capstone2LlvmIrTranslator::createX86_32(
 		llvm::Module* m,
 		cs_mode extra)
 {
-	return std::make_unique<Capstone2LlvmIrTranslatorX86_impl>(m, CS_MODE_32, extra);
+	return nullptr; //std::make_unique<Capstone2LlvmIrTranslatorX86_impl>(m, CS_MODE_32, extra);
 }
 
 std::unique_ptr<Capstone2LlvmIrTranslator> Capstone2LlvmIrTranslator::createX86_64(
 		llvm::Module* m,
 		cs_mode extra)
 {
-	return std::make_unique<Capstone2LlvmIrTranslatorX86_impl>(m, CS_MODE_64, extra);
+	return nullptr; //std::make_unique<Capstone2LlvmIrTranslatorX86_impl>(m, CS_MODE_64, extra);
 }
 
 std::unique_ptr<Capstone2LlvmIrTranslator> Capstone2LlvmIrTranslator::createPpc32(
 		llvm::Module* m,
 		cs_mode extra)
 {
-	return std::make_unique<Capstone2LlvmIrTranslatorPowerpc_impl>(m, CS_MODE_32, extra);
+	return nullptr; //std::make_unique<Capstone2LlvmIrTranslatorPowerpc_impl>(m, CS_MODE_32, extra);
 }
 
 std::unique_ptr<Capstone2LlvmIrTranslator> Capstone2LlvmIrTranslator::createPpc64(
 		llvm::Module* m,
 		cs_mode extra)
 {
-	return std::make_unique<Capstone2LlvmIrTranslatorPowerpc_impl>(m, CS_MODE_64, extra);
+	return nullptr; //std::make_unique<Capstone2LlvmIrTranslatorPowerpc_impl>(m, CS_MODE_64, extra);
 }
 
 std::unique_ptr<Capstone2LlvmIrTranslator> Capstone2LlvmIrTranslator::createPpcQpx(
 		llvm::Module* m,
 		cs_mode extra)
 {
-	return std::make_unique<Capstone2LlvmIrTranslatorPowerpc_impl>(m, CS_MODE_QPX, extra);
+	return nullptr; //std::make_unique<Capstone2LlvmIrTranslatorPowerpc_impl>(m, CS_MODE_QPX, extra);
+}
+
+std::unique_ptr<Capstone2LlvmIrTranslator> Capstone2LlvmIrTranslator::createRiscv32(
+		llvm::Module* m,
+		cs_mode extra)
+{
+	return std::make_unique<Capstone2LlvmIrTranslatorRiscv_impl>(m, CS_MODE_RISCV32, extra);
+}
+
+std::unique_ptr<Capstone2LlvmIrTranslator> Capstone2LlvmIrTranslator::createRiscv64(
+		llvm::Module* m,
+		cs_mode extra)
+{
+	return std::make_unique<Capstone2LlvmIrTranslatorRiscv_impl>(m, CS_MODE_RISCV64, extra);
 }
 
 std::unique_ptr<Capstone2LlvmIrTranslator> Capstone2LlvmIrTranslator::createSparc(

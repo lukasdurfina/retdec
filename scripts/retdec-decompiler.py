@@ -39,8 +39,8 @@ def parse_args(args):
     parser.add_argument('-a', '--arch',
                         dest='arch',
                         metavar='ARCH',
-                        choices=['mips', 'pic32', 'arm', 'thumb', 'arm64', 'powerpc', 'x86', 'x86-64'],
-                        help='Specify target architecture [mips|pic32|arm|thumb|arm64|powerpc|x86|x86-64].'
+                        choices=['mips', 'pic32', 'arm', 'thumb', 'arm64', 'powerpc', 'x86', 'x86-64', 'riscv'],
+                        help='Specify target architecture [mips|pic32|arm|thumb|arm64|powerpc|x86|x86-64|riscv].'
                              ' Required if it cannot be autodetected from the input (e.g. raw mode, Intel HEX).')
 
     parser.add_argument('-e', '--endian',
@@ -929,7 +929,7 @@ class Decompiler:
                 ords_dir = config.ARM_ORDS_DIR
             elif self.arch in ['x86', 'x86-64']:
                 ords_dir = config.X86_ORDS_DIR
-            elif self.arch in ['powerpc', 'mips', 'pic32']:
+            elif self.arch in ['powerpc', 'mips', 'pic32', 'riscv']:
                 pass
             else:
                 if self.args.generate_log:
@@ -937,7 +937,7 @@ class Decompiler:
 
                 self._cleanup()
                 utils.print_error('Unsupported target architecture \'%s\'. Supported architectures: '
-                                  'Intel x86, Intel x86-64, ARM, ARM + Thumb, ARM64, MIPS, PIC32, PowerPC.' % self.arch)
+                                  'Intel x86, Intel x86-64, ARM, ARM + Thumb, ARM64, MIPS, PIC32, PowerPC, RISCV.' % self.arch)
                 return 1
 
             # Check file class (e.g. 'ELF32', 'ELF64'). At present, we can only decompile 32-bit files.

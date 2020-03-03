@@ -141,12 +141,12 @@ bool Decoder::run()
 
 void Decoder::decode()
 {
-	LOG << "\n" << "decode():" << std::endl;
+	LOG2 << "\n" << "decode():" << std::endl;
 
 	JumpTarget jt;
 	while (getJumpTarget(jt))
 	{
-		LOG << "\t" << "processing : " << jt << std::endl;
+		LOG2 << "\t" << "processing : " << jt << std::endl;
 		decodeJumpTarget(jt);
 	}
 
@@ -181,7 +181,7 @@ void Decoder::decodeJumpTarget(const JumpTarget& jt)
 	const Address start = jt.getAddress();
 	if (start.isUndefined())
 	{
-		LOG << "\t\t" << "unknown target address -> skip" << std::endl;
+		LOG2 << "\t\t" << "unknown target address -> skip" << std::endl;
 		return;
 	}
 

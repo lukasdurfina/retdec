@@ -64,6 +64,16 @@ void Decoder::initTranslator()
 			case 32: basicMode = CS_MODE_32; break;
 		}
 	}
+	else if (a.isRiscv())
+	{
+		arch = CS_ARCH_RISCV;
+		switch (a.getBitSize())
+		{
+			case 64: basicMode = CS_MODE_RISCV64; break;
+			default:
+			case 32: basicMode = CS_MODE_RISCV32; break;
+		}
+	}
 	else if (a.isArm32OrThumb()
 			&& a.getBitSize() == 32)
 	{

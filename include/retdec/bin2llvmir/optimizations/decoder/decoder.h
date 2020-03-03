@@ -241,6 +241,22 @@ class Decoder : public llvm::ModulePass
 				ByteData bytes,
 				bool strict = false);
 
+
+	// RISCV specific.
+	//
+	private:
+		bool disasm_riscv(
+				csh ce,
+				cs_mode m,
+				ByteData& bytes,
+				uint64_t& a,
+				cs_insn* i);
+		std::size_t decodeJumpTargetDryRun_riscv(
+				const JumpTarget& jt,
+				ByteData bytes,
+				bool strict = false);
+
+
 	// IR modifications.
 	//
 	private:

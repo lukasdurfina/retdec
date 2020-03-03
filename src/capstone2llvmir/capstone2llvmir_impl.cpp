@@ -695,6 +695,7 @@ void Capstone2LlvmIrTranslator_impl<CInsn, CInsnOp>::initialize()
 				_basicMode,
 				ModeSettingError::eType::BASIC_MODE);
 	}
+
 	if (!isAllowedExtraMode(_extraMode))
 	{
 		throw ModeSettingError(
@@ -2291,6 +2292,7 @@ template class Capstone2LlvmIrTranslator_impl<cs_arm, cs_arm_op>;
 template class Capstone2LlvmIrTranslator_impl<cs_arm64, cs_arm64_op>;
 template class Capstone2LlvmIrTranslator_impl<cs_mips, cs_mips_op>;
 template class Capstone2LlvmIrTranslator_impl<cs_ppc, cs_ppc_op>;
+template class Capstone2LlvmIrTranslator_impl<cs_riscv, cs_riscv_op>;
 template class Capstone2LlvmIrTranslator_impl<cs_x86, cs_x86_op>;
 
 } // namespace capstone2llvmir

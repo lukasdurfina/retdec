@@ -49,6 +49,7 @@ class ProgramOptions
 					else if (_arch == "mips") arch = CS_ARCH_MIPS;
 					else if (_arch == "x86") arch = CS_ARCH_X86;
 					else if (_arch == "ppc") arch = CS_ARCH_PPC;
+					else if (_arch == "riscv") arch = CS_ARCH_RISCV;
 					else if (_arch == "sparc") arch = CS_ARCH_SPARC;
 					else if (_arch == "sysz") arch = CS_ARCH_SYSZ;
 					else if (_arch == "xcore") arch = CS_ARCH_XCORE;
@@ -137,6 +138,7 @@ class ProgramOptions
 				case CS_ARCH_ARM: return CS_MODE_ARM; // CS_MODE_THUMB
 				case CS_ARCH_ARM64: return CS_MODE_ARM;
 				case CS_ARCH_MIPS: return CS_MODE_MIPS32; // CS_MODE_MIPS{32, 64, 32R6}
+				case CS_ARCH_RISCV: return CS_MODE_RISCV32; // CS_MODE_MIPS{32, 64, 32R6}
 				case CS_ARCH_X86: return CS_MODE_32; // CS_MODE_{16, 32, 64}
 				case CS_ARCH_PPC: return CS_MODE_32;
 				case CS_ARCH_SPARC: return CS_MODE_LITTLE_ENDIAN; // 0
@@ -232,6 +234,7 @@ ks_arch capstoneArchToKeystoneArch(cs_arch a)
 		case CS_ARCH_MIPS: return KS_ARCH_MIPS;
 		case CS_ARCH_X86: return KS_ARCH_X86;
 		case CS_ARCH_PPC: return KS_ARCH_PPC;
+		case CS_ARCH_RISCV: return KS_ARCH_RISCV;
 		case CS_ARCH_SPARC: return KS_ARCH_SPARC;
 		case CS_ARCH_SYSZ: return KS_ARCH_SYSTEMZ;
 		case CS_ARCH_XCORE:
@@ -278,6 +281,14 @@ ks_mode capstoneModeBasicToKeystoneMode(cs_arch a, cs_mode m)
 	else if (a == CS_ARCH_MIPS && m == CS_MODE_MIPS32R6) // 1 << 6
 	{
 		return KS_MODE_MIPS32R6;
+	}
+	else if (a == CS_ARCH_RISCV && m == CS_MODE_RISCV32) // 1 << 6
+	{
+		return KS_MODE_RISCV32;
+	}
+	else if (a == CS_ARCH_RISCV && m == CS_MODE_RISCV64) // 1 << 6
+	{
+		return KS_MODE_RISCV64;
 	}
 	else
 	{

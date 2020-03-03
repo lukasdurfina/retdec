@@ -2598,6 +2598,10 @@ std::size_t ElfFormat::getBytesPerWord() const
 		case EM_NONE:
 			return isWiiPowerPc() ? 4 : 0;
 
+		// Architecture::RISCV
+		case EM_RISCV:
+			return (elfClass == ELFCLASS64) ? 8 : 4;
+
 		// unsupported architecture
 		default:
 			return 0;
@@ -2768,6 +2772,8 @@ Architecture ElfFormat::getTargetArchitecture() const
 		case EM_PPC:
 		case EM_PPC64:
 			return Architecture::POWERPC;
+		case EM_RISCV:
+			return Architecture::RISCV;
 		case EM_NONE:
 			return isWiiPowerPc() ? Architecture::POWERPC : Architecture::UNKNOWN;
 		default:

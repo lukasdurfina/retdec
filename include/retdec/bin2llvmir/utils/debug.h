@@ -27,6 +27,9 @@ namespace bin2llvmir {
 	if (!debug_enabled) {} \
 	else std::cout << std::showbase
 
+#define LOG2 \
+	std::cout << std::showbase
+
 /**
  * Print any LLVM object which implements @c print(llvm::raw_string_ostream&)
  * method into std::string.

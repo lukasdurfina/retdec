@@ -22,6 +22,7 @@ add_library(retdec-bin2llvmir STATIC
 	optimizations/decoder/mips.cpp
 	optimizations/decoder/patterns.cpp
 	optimizations/decoder/powerpc.cpp
+	optimizations/decoder/riscv.cpp
 	optimizations/decoder/x86.cpp
 	optimizations/dsm_generator/dsm_generator.cpp
 	optimizations/dump_module/dump_module.cpp
@@ -73,6 +74,7 @@ add_library(retdec-bin2llvmir STATIC
 	providers/abi/pic32.cpp
 	providers/abi/powerpc.cpp
 	providers/abi/powerpc64.cpp
+	providers/abi/riscv.cpp
 	providers/abi/x64.cpp
 	providers/abi/x86.cpp
 	providers/calling_convention/calling_convention.cpp
@@ -84,6 +86,7 @@ add_library(retdec-bin2llvmir STATIC
 	providers/calling_convention/pic32/pic32_conv.cpp
 	providers/calling_convention/powerpc/powerpc_conv.cpp
 	providers/calling_convention/powerpc64/powerpc64_conv.cpp
+	providers/calling_convention/riscv/riscv_conv.cpp
 	providers/calling_convention/x64/x64_conv.cpp
 	providers/calling_convention/x64/x64_microsoft.cpp
 	providers/calling_convention/x64/x64_systemv.cpp

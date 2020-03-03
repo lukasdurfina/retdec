@@ -21,6 +21,7 @@ const std::string ARCH_THUMB   = "thumb";
 const std::string ARCH_x86     = "x86";
 const std::string ARCH_PPC     = "powerpc";
 const std::string ARCH_PPC64   = "powerpc64";
+const std::string ARCH_RISCV   = "riscv";
 
 } // anonymous namespace
 
@@ -44,6 +45,7 @@ bool Architecture::isUnknown() const      { return isArch(eArch::UNKNOWN); }
 bool Architecture::isMips() const         { return isArch(eArch::MIPS); }
 bool Architecture::isMips64() const       { return isMips() && getBitSize() == 64; }
 bool Architecture::isMipsOrPic32() const  { return isMips() || isPic32(); }
+bool Architecture::isRiscv() const         { return isArch(eArch::RISCV); }
 
 /**
  * Checks if this architecture instance matches with the provided architecture name.
@@ -75,6 +77,7 @@ void Architecture::setIsArm32()          { setName(ARCH_ARM); setBitSize(32); }
 void Architecture::setIsArm64()          { setName(ARCH_ARM64); setBitSize(64); }
 void Architecture::setIsX86()            { setName(ARCH_x86); }
 void Architecture::setIsPpc()            { setName(ARCH_PPC); }
+void Architecture::setIsRiscv()          { setName(ARCH_RISCV); }
 
 void Architecture::setIsEndianLittle()           { _endian = E_LITTLE; }
 void Architecture::setIsEndianBig()              { _endian = E_BIG; }
@@ -133,6 +136,10 @@ void Architecture::setArch()
 	else if (retdec::utils::containsCaseInsensitive(_name, ARCH_PPC))
 	{
 		_arch = eArch::PPC;
+	}
+	else if (retdec::utils::containsCaseInsensitive(_name, ARCH_RISCV))
+	{
+		_arch = eArch::RISCV;
 	}
 }
 

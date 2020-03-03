@@ -10,6 +10,7 @@
 #include "retdec/bin2llvmir/providers/abi/mips.h"
 #include "retdec/bin2llvmir/providers/abi/ms_x64.h"
 #include "retdec/bin2llvmir/providers/abi/powerpc.h"
+#include "retdec/bin2llvmir/providers/abi/riscv.h"
 #include "retdec/bin2llvmir/providers/abi/x86.h"
 #include "retdec/bin2llvmir/providers/abi/x64.h"
 #include "retdec/bin2llvmir/providers/abi/pic32.h"
@@ -259,6 +260,11 @@ bool Abi::isPic32() const
 	return _config->getConfig().architecture.isPic32();
 }
 
+bool Abi::isRiscv() const
+{
+	return _config->getConfig().architecture.isRiscv();
+}
+
 bool Abi::supportsCallingConvention(const CallingConvention::ID& cc)
 {
 	return getCallingConvention(cc) != nullptr;
@@ -331,6 +337,11 @@ Abi* AbiProvider::addAbi(
 	else if (c->getConfig().architecture.isPpc())
 	{
 		auto p = _module2abi.emplace(m, std::make_unique<AbiPowerpc>(m, c));
+		return p.first->second.get();
+	}
+	else if (c->getConfig().architecture.isRiscv())
+	{
+		auto p = _module2abi.emplace(m, std::make_unique<AbiRiscv>(m, c));
 		return p.first->second.get();
 	}
 	else if (c->getConfig().architecture.isX86_64())

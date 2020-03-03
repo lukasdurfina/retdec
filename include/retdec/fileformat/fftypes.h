@@ -62,7 +62,8 @@ enum class Architecture
 	X86_64,
 	ARM,
 	POWERPC,
-	MIPS
+	MIPS,
+	RISCV,
 };
 
 enum LoadFlags

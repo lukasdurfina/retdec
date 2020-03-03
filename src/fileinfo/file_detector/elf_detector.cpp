@@ -1424,6 +1424,12 @@ void ElfDetector::detectArchitecture()
 			result = "MIPS (Stanford MIPS-X)";
 			break;
 
+		// RISCV
+		case EM_RISCV:
+			result = "RISCV";
+			break;
+
+
 		// ARM
 		case EM_ARM:
 			result = "ARM";

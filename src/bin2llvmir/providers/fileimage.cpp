@@ -76,6 +76,7 @@ FileImage::FileImage(
 	if (ca.isArm32OrThumb()) arch = retdec::fileformat::Architecture::ARM;
 	if (ca.isPpc()) arch = retdec::fileformat::Architecture::POWERPC;
 	if (ca.isMipsOrPic32()) arch = retdec::fileformat::Architecture::MIPS;
+	if (ca.isRiscv()) arch = retdec::fileformat::Architecture::RISCV;
 
 	_image->getFileFormat()->initArchitecture(
 			arch,
@@ -95,6 +96,10 @@ FileImage::FileImage(
 			|| _image->getBytesPerWord() == 0
 			|| _image->getWordLength() == 0)
 	{
+		std::cout << "ERROR:  segments " << _image->getSegments().size()
+		  << " - " << _image->getByteLength() << " - "
+		  << _image->getBytesPerWord() << " - "
+		  << _image->getWordLength() << std::endl;
 		throw std::runtime_error("Missing basic info about input file"
 				" -> there can be no decompilation");
 	}

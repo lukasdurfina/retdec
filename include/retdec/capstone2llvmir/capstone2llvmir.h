@@ -26,6 +26,7 @@
 #include "retdec/capstone2llvmir/arm64/arm64_defs.h"
 #include "retdec/capstone2llvmir/mips/mips_defs.h"
 #include "retdec/capstone2llvmir/powerpc/powerpc_defs.h"
+#include "retdec/capstone2llvmir/riscv/riscv_defs.h"
 #include "retdec/capstone2llvmir/x86/x86_defs.h"
 
 namespace retdec {
@@ -219,6 +220,33 @@ class Capstone2LlvmIrTranslator
 		static std::unique_ptr<Capstone2LlvmIrTranslator> createPpcQpx(
 				llvm::Module* m,
 				cs_mode extra = CS_MODE_LITTLE_ENDIAN);
+
+		/**
+		 * Create RISCV translator with basic mode @c CS_MODE_RISCV32, and extra
+		 * mode @c extra.
+		 * This is meant to be used when RISCV needs to be used with extra mode
+		 * like @c CS_MODE_BIG_ENDIAN. If you want to create a different flavour
+		 * of RISCV translator use @c createRiscv64().
+		 * @return Unique pointer to created translator, or @c nullptr if
+		 * translator (with the specified mode) could not be created.
+		 */
+		static std::unique_ptr<Capstone2LlvmIrTranslator> createRiscv32(
+				llvm::Module* m,
+				cs_mode extra = CS_MODE_LITTLE_ENDIAN);
+		/**
+		 * Create RISCV translator with basic mode @c CS_MODE_RISCV64, and extra
+		 * mode @c extra.
+		 * This is meant to be used when RISCV needs to be used with extra mode
+		 * like @c CS_MODE_BIG_ENDIAN. If you want to create a different flavour
+		 * of RISCV translator use @c createRiscv32().
+		 * @return Unique pointer to created translator, or @c nullptr if
+		 * translator (with the specified mode) could not be created.
+		 */
+		static std::unique_ptr<Capstone2LlvmIrTranslator> createRiscv64(
+				llvm::Module* m,
+				cs_mode extra = CS_MODE_LITTLE_ENDIAN);
+
+
 		/**
 		 * Create SPARC translator with extra mode @c extra.
 		 * This is meant to be used when SPARC needs to be used with extra mode

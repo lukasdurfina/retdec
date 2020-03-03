@@ -37,6 +37,7 @@ class Architecture
 		bool isX86_64() const;
 		bool isPpc() const;
 		bool isPpc64() const;
+		bool isRiscv() const;
 		bool isEndianLittle() const;
 		bool isEndianBig() const;
 		bool isEndianKnown() const;
@@ -54,6 +55,7 @@ class Architecture
 		void setIsArm64();
 		void setIsX86();
 		void setIsPpc();
+		void setIsRiscv();
 		void setIsEndianLittle();
 		void setIsEndianBig();
 		void setIsEndianUnknown();
@@ -84,6 +86,7 @@ class Architecture
 			ARM,
 			X86,
 			PPC,
+			RISCV,
 		};
 
 	private:

@@ -100,6 +100,7 @@ class Abi
 		bool isPowerPC() const;
 		bool isPowerPC64() const;
 		bool isPic32() const;
+		bool isRiscv() const;
 
 	// Calling conventions.
 	//

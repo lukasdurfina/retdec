@@ -9,6 +9,6 @@
 
 // Debug logs enabled/disabled.
 #include "retdec/bin2llvmir/utils/debug.h"
-const bool debug_enabled = false;
+const bool debug_enabled = true;
 
 #endif
