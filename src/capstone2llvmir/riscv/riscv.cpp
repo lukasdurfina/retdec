@@ -475,14 +475,84 @@ void Capstone2LlvmIrTranslatorRiscv_impl::translateBreak(cs_insn* i, cs_riscv* m
 	return;
 }
 
+
 /**
- *
+ * RISCV_INS_LD, RISCV_INS_LW, RISCV_INS_LH, RISCV_INS_LB, RISCV_INS_FLW, RISCV_INS_FLD
+ */
+void Capstone2LlvmIrTranslatorRiscv_impl::translateLoadMemory(cs_insn* i, cs_riscv* mi, llvm::IRBuilder<>& irb)
+{
+	EXPECT_IS_BINARY(i, mi, irb);
+
+	llvm::Type* ty = nullptr;
+	eOpConv ct = eOpConv::THROW;
+
+	switch (i->id)
+	{
+		case RISCV_INS_LB: ty = irb.getInt8Ty(); ct = eOpConv::SEXT_TRUNC_OR_BITCAST; break;
+		case RISCV_INS_LBU: ty = irb.getInt8Ty(); ct = eOpConv::ZEXT_TRUNC_OR_BITCAST; break;
+		case RISCV_INS_LH: ty = irb.getInt16Ty(); ct = eOpConv::SEXT_TRUNC_OR_BITCAST; break;
+		case RISCV_INS_LHU: ty = irb.getInt16Ty(); ct = eOpConv::ZEXT_TRUNC_OR_BITCAST; break;
+		case RISCV_INS_LW: ty = irb.getInt32Ty(); ct = eOpConv::SEXT_TRUNC_OR_BITCAST; break;
+		case RISCV_INS_LWU: ty = irb.getInt32Ty(); ct = eOpConv::ZEXT_TRUNC_OR_BITCAST; break;
+		case RISCV_INS_LD: ty = irb.getInt64Ty(); ct = eOpConv::SEXT_TRUNC_OR_BITCAST; break;
+		case RISCV_INS_FLW: ty = irb.getFloatTy(); ct = eOpConv::FPCAST_OR_BITCAST; break;
+		case RISCV_INS_FLD: ty = irb.getDoubleTy(); ct = eOpConv::FPCAST_OR_BITCAST; break;
+		default:
+			throw GenericError("Unhandled insn ID in translateLoadMemory().");
+	}
+
+	op1 = loadOp(mi->operands[1], irb, ty);
+	storeOp(mi->operands[0], op1, irb, ct);
+}
+
+/**
+ * RISCV_INS_NOP
  */
 void Capstone2LlvmIrTranslatorRiscv_impl::translateNop(cs_insn* i, cs_riscv* mi, llvm::IRBuilder<>& irb)
 {
 	// Nothing.
 }
 
+/**
+ * RISCV_INS_SD, RISCV_INS_SW, RISCV_INS_SH, RISCV_INS_SB, RISCV_INS_FSW, RISCV_INS_FSD
+ */
+void Capstone2LlvmIrTranslatorRiscv_impl::translateStoreMemory(cs_insn* i, cs_riscv* mi, llvm::IRBuilder<>& irb)
+{
+	EXPECT_IS_BINARY_OR_TERNARY(i, mi, irb);
+
+	llvm::Type* ty = nullptr;
+	switch (i->id)
+	{
+		case RISCV_INS_SB: ty = irb.getInt8Ty(); break;
+		case RISCV_INS_SH: ty = irb.getInt16Ty(); break;
+		case RISCV_INS_SW: ty = irb.getInt32Ty(); break;
+		case RISCV_INS_SD: ty = irb.getInt64Ty(); break;
+		case RISCV_INS_FSW: ty = irb.getFloatTy(); break;
+		case RISCV_INS_FSD: ty = irb.getDoubleTy(); break;
+		default:
+		{
+			throw GenericError("RISCV: unhandled store");
+		}
+	}
+
+	op0 = loadOp(mi->operands[0], irb);
+	if (ty->isFloatingPointTy())
+	{
+		// TODO verify
+		// This is not exact, in 64-bit mode, only lower 32-bits of FPR should
+		// be used -> truncate, not cast.
+		op0 = irb.CreateFPCast(op0, ty);
+	}
+	else if (ty->isIntegerTy())
+	{
+		op0 = irb.CreateZExtOrTrunc(op0, ty);
+	}
+	else
+	{
+		throw GenericError("unhandled type");
+	}
+	storeOp(mi->operands[1], op0, irb);
+}
 
 /**
  *

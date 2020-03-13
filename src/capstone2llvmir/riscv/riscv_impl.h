@@ -118,8 +118,11 @@ class Capstone2LlvmIrTranslatorRiscv_impl :
 
 		void translateBreak(cs_insn* i, cs_riscv* mi, llvm::IRBuilder<>& irb);
 
+		void translateLoadMemory(cs_insn* i, cs_riscv* mi, llvm::IRBuilder<>& irb);
+
 		void translateNop(cs_insn* i, cs_riscv* mi, llvm::IRBuilder<>& irb);
 
+        void translateStoreMemory(cs_insn* i, cs_riscv* mi, llvm::IRBuilder<>& irb);
 		void translateSyscall(cs_insn* i, cs_riscv* mi, llvm::IRBuilder<>& irb);
 
 };
