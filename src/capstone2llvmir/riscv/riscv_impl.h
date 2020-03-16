@@ -61,8 +61,6 @@ class Capstone2LlvmIrTranslatorRiscv_impl :
 //
 	protected:
 		llvm::Value* getCurrentPc(cs_insn* i);
-		llvm::Value* getNextNextInsnAddress(cs_insn* i);
-		llvm::Value* getUnpredictableValue();
 
 		//uint32_t singlePrecisionToDoublePrecisionFpRegister(uint32_t r) const;
 
@@ -88,9 +86,6 @@ class Capstone2LlvmIrTranslatorRiscv_impl :
 				llvm::IRBuilder<>& irb,
 				eOpConv ct = eOpConv::SEXT_TRUNC_OR_BITCAST) override;
 
-		llvm::StoreInst* storeRegisterUnpredictable(
-				uint32_t r,
-				llvm::IRBuilder<>& irb);
 		bool isFpInstructionVariant(cs_insn* i);
 
 		virtual bool isOperandRegister(cs_riscv_op& op) override;
@@ -118,7 +113,10 @@ class Capstone2LlvmIrTranslatorRiscv_impl :
 
 		void translateBreak(cs_insn* i, cs_riscv* mi, llvm::IRBuilder<>& irb);
 
+		void translateJal(cs_insn* i, cs_riscv* mi, llvm::IRBuilder<>& irb);
+		void translateJalr(cs_insn* i, cs_riscv* mi, llvm::IRBuilder<>& irb);
 		void translateLoadMemory(cs_insn* i, cs_riscv* mi, llvm::IRBuilder<>& irb);
+		void translateLui(cs_insn* i, cs_riscv* mi, llvm::IRBuilder<>& irb);
 
 		void translateNop(cs_insn* i, cs_riscv* mi, llvm::IRBuilder<>& irb);
 

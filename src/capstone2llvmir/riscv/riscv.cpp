@@ -115,8 +115,9 @@ void Capstone2LlvmIrTranslatorRiscv_impl::translateInstruction(
 	cs_detail* d = i->detail;
 	cs_riscv* mi = &d->riscv;
 
-	std::cout << "Translate instruction at" << std::hex << i->address
-	  << ": " << i->mnemonic << "  " << i->op_str << " (" << std::dec << i->size << "b)"<< std::endl;
+	std::cout << "Translate instruction at " << std::hex << i->address
+	  << ": " << i->mnemonic << "  " << i->op_str << " (" << std::dec << i->size << "b), "
+	  << "id: " << i->id << std::endl;
 
 	auto fIt = _i2fm.find(i->id);
 	if (fIt != _i2fm.end() && fIt->second != nullptr)
@@ -143,82 +144,6 @@ llvm::Value* Capstone2LlvmIrTranslatorRiscv_impl::getCurrentPc(cs_insn* i)
 	return getNextInsnAddress(i);
 }
 
-/**
- * MIPS specifications often says something like:
- * "The return link is the address of the second instruction following the,
- * branch, at which location execution continues after a procedure call."
- * This method returns this address as an LLVM @c ConstantInt.
- */
-// TODO is it  relevant for riscv
-llvm::Value* Capstone2LlvmIrTranslatorRiscv_impl::getNextNextInsnAddress(cs_insn* i)
-{
-	return llvm::ConstantInt::get(getDefaultType(), i->address + (2 * i->size));
-}
-
-/**
- * @return @c Nullptr -- there is no value.
- *
- * @c Nullptr will cause all the consumers like @c storeRegisterUnpredictable()
- * not to generate any code that depends on unpredictable value.
- *
- * MIPS specifications says:
- * "... Software can never depend on results that are UNPREDICTABLE.
- * UNPREDICTABLE operations may cause a result to be generated or not. ..."
- *
- * Right now, we choose not to generate it. This may change in future.
- */
-llvm::Value* Capstone2LlvmIrTranslatorRiscv_impl::getUnpredictableValue()
-{
-	return nullptr;
-}
-
-//uint32_t Capstone2LlvmIrTranslatorRiscv_impl::singlePrecisionToDoublePrecisionFpRegister(
-//		uint32_t r) const
-//{
-	// Working with odd double reg (e.g. sdc1 $f21, -0x7ba3($v1)) may happen.
-	// I have no idea why, and if this is ok, or it is simply caused by decoding
-	// data. But it is a real example from real binary, IDA has the same thing.
-	// Right now, we map odd numbers to even ones. But we would be able to
-	// create their own double registers very easily.
-	/*switch (r)
-	{
-		case MIPS_REG_F0: return MIPS_REG_FD0;
-		case MIPS_REG_F1: return MIPS_REG_FD0;
-		case MIPS_REG_F2: return MIPS_REG_FD2;
-		case MIPS_REG_F3: return MIPS_REG_FD2;
-		case MIPS_REG_F4: return MIPS_REG_FD4;
-		case MIPS_REG_F5: return MIPS_REG_FD4;
-		case MIPS_REG_F6: return MIPS_REG_FD6;
-		case MIPS_REG_F7: return MIPS_REG_FD6;
-		case MIPS_REG_F8: return MIPS_REG_FD8;
-		case MIPS_REG_F9: return MIPS_REG_FD8;
-		case MIPS_REG_F10: return MIPS_REG_FD10;
-		case MIPS_REG_F11: return MIPS_REG_FD10;
-		case MIPS_REG_F12: return MIPS_REG_FD12;
-		case MIPS_REG_F13: return MIPS_REG_FD12;
-		case MIPS_REG_F14: return MIPS_REG_FD14;
-		case MIPS_REG_F15: return MIPS_REG_FD14;
-		case MIPS_REG_F16: return MIPS_REG_FD16;
-		case MIPS_REG_F17: return MIPS_REG_FD16;
-		case MIPS_REG_F18: return MIPS_REG_FD18;
-		case MIPS_REG_F19: return MIPS_REG_FD18;
-		case MIPS_REG_F20: return MIPS_REG_FD20;
-		case MIPS_REG_F21: return MIPS_REG_FD20;
-		case MIPS_REG_F22: return MIPS_REG_FD22;
-		case MIPS_REG_F23: return MIPS_REG_FD22;
-		case MIPS_REG_F24: return MIPS_REG_FD24;
-		case MIPS_REG_F25: return MIPS_REG_FD24;
-		case MIPS_REG_F26: return MIPS_REG_FD26;
-		case MIPS_REG_F27: return MIPS_REG_FD26;
-		case MIPS_REG_F28: return MIPS_REG_FD28;
-		case MIPS_REG_F29: return MIPS_REG_FD28;
-		case MIPS_REG_F30: return MIPS_REG_FD30;
-		case MIPS_REG_F31: return MIPS_REG_FD30;
-		default:
-			throw GenericError("Can not convert to double precision "
-					"register.");
-	}*/
-//}
 
 llvm::Value* Capstone2LlvmIrTranslatorRiscv_impl::loadRegister(
 		uint32_t r,
@@ -235,13 +160,6 @@ llvm::Value* Capstone2LlvmIrTranslatorRiscv_impl::loadRegister(
 	{
 		return llvm::ConstantInt::getSigned(getDefaultType(), 0);
 	}
-
-	/*if (cs_insn_group(_handle, _insn, MIPS_GRP_NOTFP64BIT)
-			&& MIPS_REG_F0 <= r
-			&& r <= MIPS_REG_F31)
-	{
-		r = singlePrecisionToDoublePrecisionFpRegister(r);
-	}*/
 
 	llvm::Value* llvmReg = getRegister(r);
 	if (llvmReg == nullptr)
@@ -331,12 +249,6 @@ llvm::StoreInst* Capstone2LlvmIrTranslatorRiscv_impl::storeRegister(
 		return nullptr;
 	}
 
-	/*if (cs_insn_group(_handle, _insn, MIPS_GRP_NOTFP64BIT)
-			&& MIPS_REG_F0 <= r
-			&& r <= MIPS_REG_F31)
-	{
-		r = singlePrecisionToDoublePrecisionFpRegister(r);
-	}*/
 
 	auto* llvmReg = getRegister(r);
 	if (llvmReg == nullptr)
@@ -348,18 +260,6 @@ llvm::StoreInst* Capstone2LlvmIrTranslatorRiscv_impl::storeRegister(
 	return irb.CreateStore(val, llvmReg);
 }
 
-/**
- * Store unpredictable value to register @a r.
- * No store is generated if unpredictable value is set to @c nullptr (see
- * @c getUnpredictableValue()).
- */
-llvm::StoreInst* Capstone2LlvmIrTranslatorRiscv_impl::storeRegisterUnpredictable(
-		uint32_t r,
-		llvm::IRBuilder<>& irb)
-{
-	auto* u = getUnpredictableValue();
-	return u ? storeRegister(r, u, irb) : nullptr;
-}
 
 /**
  * @a ct is used when storing a value to register with a different type.
@@ -414,15 +314,7 @@ llvm::Instruction* Capstone2LlvmIrTranslatorRiscv_impl::storeOp(
 		}
 	}
 }
-/*
-bool Capstone2LlvmIrTranslatorRiscv_impl::isFpInstructionVariant(cs_insn* i)
-{
-	auto& mi = i->detail->mips;
-	return mi.op_count > 0
-			&& mi.operands[0].type == MIPS_OP_REG
-			&& MIPS_REG_F0 <= mi.operands[0].reg
-			&& mi.operands[0].reg <= MIPS_REG_F31;
-}*/
+
 
 bool Capstone2LlvmIrTranslatorRiscv_impl::isOperandRegister(cs_riscv_op& op)
 {
@@ -441,7 +333,7 @@ bool Capstone2LlvmIrTranslatorRiscv_impl::isGeneralPurposeRegister(uint32_t r)
 //
 
 /**
- *
+ * RISCV_INS_ADD, RISCV_INS_ADDI, RISCV_INS_ADDIW, RISCV_INS_ADDW
  */
 void Capstone2LlvmIrTranslatorRiscv_impl::translateAdd(cs_insn* i, cs_riscv* mi, llvm::IRBuilder<>& irb)
 {
@@ -455,7 +347,7 @@ void Capstone2LlvmIrTranslatorRiscv_impl::translateAdd(cs_insn* i, cs_riscv* mi,
 }
 
 /**
- *
+ * RISCV_INS_AND, RISCV_INS_ANDI
  */
 void Capstone2LlvmIrTranslatorRiscv_impl::translateAnd(cs_insn* i, cs_riscv* mi, llvm::IRBuilder<>& irb)
 {
@@ -468,11 +360,50 @@ void Capstone2LlvmIrTranslatorRiscv_impl::translateAnd(cs_insn* i, cs_riscv* mi,
 
 
 /**
- *
+ * RISCV_INS_EBREAK
  */
 void Capstone2LlvmIrTranslatorRiscv_impl::translateBreak(cs_insn* i, cs_riscv* mi, llvm::IRBuilder<>& irb)
 {
 	return;
+}
+
+
+/**
+ * RISCV_INS_JAL, RISCV_INS_JALR
+ */
+void Capstone2LlvmIrTranslatorRiscv_impl::translateJal(cs_insn* i, cs_riscv* mi, llvm::IRBuilder<>& irb)
+{
+	std::cout << "Generating call function at " << std::hex << i->address << std::dec << std::endl;
+	//EXPECT_IS_UNARY(i, mi, irb);
+
+    std::cout << "Generating call function at " << std::hex << i->address << std::dec << std::endl;
+	storeRegister(RISCV_REG_RA, getNextInsnAddress(i), irb);
+	op0 = loadOpUnary(mi, irb);
+	generateCallFunctionCall(irb, op0);
+}
+
+/**
+ * RISCV_INS_JALR
+ */
+void Capstone2LlvmIrTranslatorRiscv_impl::translateJalr(cs_insn* i, cs_riscv* mi, llvm::IRBuilder<>& irb)
+{
+	std::cout << "Generating return function call at " << std::hex << i->address << std::dec << std::endl;
+	//EXPECT_IS_UNARY(i, mi, irb);
+
+	// Verify if we need to store RA, because JALR is used for
+	// jr and ret
+	// storeRegister(RISCV_REG_RA, getNextInsnAddress(i), irb);
+
+	// TODO handle jr
+	//op0 = loadOpUnary(mi, irb);
+	std::cout << "Generating return function call at " << std::hex << i->address << std::dec << std::endl;
+	generateReturnFunctionCall(irb, op0);
+    //bool isReturn = mi->operands[0].reg == RISCV_REG_RA;
+
+	//if (isReturn)
+	//    generateReturnFunctionCall(irb, op0);
+	//else
+	//    generateCallFunctionCall(irb, op0);
 }
 
 
@@ -503,6 +434,22 @@ void Capstone2LlvmIrTranslatorRiscv_impl::translateLoadMemory(cs_insn* i, cs_ris
 
 	op1 = loadOp(mi->operands[1], irb, ty);
 	storeOp(mi->operands[0], op1, irb, ct);
+}
+
+/**
+ * RISCV_INS_LUI
+ * LUI (load upper immediate) is used to build 32-bit constants and uses the U-type format.
+ * LUI places the U-immediate value in the top 20 bits of the destination registerrd,
+ * filling in the lowest 12 bits with zeros.
+ */
+void Capstone2LlvmIrTranslatorRiscv_impl::translateLui(cs_insn* i, cs_riscv* mi, llvm::IRBuilder<>& irb)
+{
+	EXPECT_IS_BINARY(i, mi, irb);
+
+	op1 = loadOp(mi->operands[1], irb);
+	op1 = irb.CreateZExt(op1, getDefaultType());
+	op1 = irb.CreateShl(op1, llvm::ConstantInt::get(op1->getType(), 12));
+	storeOp(mi->operands[0], op1, irb);
 }
 
 /**
@@ -555,7 +502,7 @@ void Capstone2LlvmIrTranslatorRiscv_impl::translateStoreMemory(cs_insn* i, cs_ri
 }
 
 /**
- *
+ * RISCV_INS_ECALL
  */
 void Capstone2LlvmIrTranslatorRiscv_impl::translateSyscall(cs_insn* i, cs_riscv* mi, llvm::IRBuilder<>& irb)
 {

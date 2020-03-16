@@ -167,7 +167,7 @@ void Capstone2LlvmIrTranslatorRiscv_impl::initializePseudoCallInstructionIDs()
 	_callInsnIds =
 	{
 			RISCV_INS_JAL,
-			RISCV_INS_JALR,
+			//RISCV_INS_JALR,
 			//
 	};
 
@@ -347,7 +347,7 @@ std::map<std::size_t, void (Capstone2LlvmIrTranslatorRiscv_impl::*)(cs_insn* i, 
         {RISCV_INS_DIVUW, &Capstone2LlvmIrTranslatorRiscv_impl::translateNop},           // TODO
         {RISCV_INS_DIVW, &Capstone2LlvmIrTranslatorRiscv_impl::translateNop},            // TODO
         {RISCV_INS_EBREAK, &Capstone2LlvmIrTranslatorRiscv_impl::translateBreak},
-        {RISCV_INS_ECALL, &Capstone2LlvmIrTranslatorRiscv_impl::translateNop},      // TODO
+        {RISCV_INS_ECALL, &Capstone2LlvmIrTranslatorRiscv_impl::translateSyscall},
         {RISCV_INS_FADD_D, &Capstone2LlvmIrTranslatorRiscv_impl::translateNop},     // TODO
         {RISCV_INS_FADD_S, &Capstone2LlvmIrTranslatorRiscv_impl::translateNop},     // TODO
         {RISCV_INS_FCLASS_D, &Capstone2LlvmIrTranslatorRiscv_impl::translateNop},   // TODO
@@ -413,8 +413,8 @@ std::map<std::size_t, void (Capstone2LlvmIrTranslatorRiscv_impl::*)(cs_insn* i, 
         {RISCV_INS_FSUB_D, &Capstone2LlvmIrTranslatorRiscv_impl::translateNop},     // TODO
         {RISCV_INS_FSUB_S, &Capstone2LlvmIrTranslatorRiscv_impl::translateNop},     // TODO
         {RISCV_INS_FSW, &Capstone2LlvmIrTranslatorRiscv_impl::translateStoreMemory},
-        {RISCV_INS_JAL, &Capstone2LlvmIrTranslatorRiscv_impl::translateNop},        // TODO
-        {RISCV_INS_JALR, &Capstone2LlvmIrTranslatorRiscv_impl::translateNop},       // TODO
+        {RISCV_INS_JAL, &Capstone2LlvmIrTranslatorRiscv_impl::translateJal},
+        {RISCV_INS_JALR, &Capstone2LlvmIrTranslatorRiscv_impl::translateJalr},
         {RISCV_INS_LB, &Capstone2LlvmIrTranslatorRiscv_impl::translateLoadMemory},
         {RISCV_INS_LBU, &Capstone2LlvmIrTranslatorRiscv_impl::translateLoadMemory},
         {RISCV_INS_LD, &Capstone2LlvmIrTranslatorRiscv_impl::translateLoadMemory},
@@ -428,7 +428,7 @@ std::map<std::size_t, void (Capstone2LlvmIrTranslatorRiscv_impl::*)(cs_insn* i, 
         {RISCV_INS_LR_W_AQ, &Capstone2LlvmIrTranslatorRiscv_impl::translateNop},    // TODO
         {RISCV_INS_LR_W_AQ_RL, &Capstone2LlvmIrTranslatorRiscv_impl::translateNop}, // TODO
         {RISCV_INS_LR_W_RL, &Capstone2LlvmIrTranslatorRiscv_impl::translateNop},    // TODO
-        {RISCV_INS_LUI, &Capstone2LlvmIrTranslatorRiscv_impl::translateNop},        // TODO
+        {RISCV_INS_LUI, &Capstone2LlvmIrTranslatorRiscv_impl::translateLui},
         {RISCV_INS_LW, &Capstone2LlvmIrTranslatorRiscv_impl::translateLoadMemory},
         {RISCV_INS_LWU, &Capstone2LlvmIrTranslatorRiscv_impl::translateLoadMemory},
         {RISCV_INS_MRET, &Capstone2LlvmIrTranslatorRiscv_impl::translateNop},       // TODO
