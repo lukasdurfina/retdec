@@ -358,6 +358,13 @@ void Capstone2LlvmIrTranslatorRiscv_impl::translateAnd(cs_insn* i, cs_riscv* mi,
 	storeOp(mi->operands[0], a, irb);
 }
 
+/**
+ * RISCV_INS_AUIPC
+ */
+void Capstone2LlvmIrTranslatorRiscv_impl::translateAuipc(cs_insn* i, cs_riscv* mi, llvm::IRBuilder<>& irb)
+{
+	// TODO
+}
 
 /**
  * RISCV_INS_EBREAK
@@ -367,14 +374,61 @@ void Capstone2LlvmIrTranslatorRiscv_impl::translateBreak(cs_insn* i, cs_riscv* m
 	return;
 }
 
+/**
+ * RISCV_INS_BEQ, RISCV_INS_BNE
+ */
+void Capstone2LlvmIrTranslatorRiscv_impl::translateCondBranch(cs_insn* i, cs_riscv* mi, llvm::IRBuilder<>& irb)
+{
+    if (mi->op_count == 2)
+	{
+		//EXPECT_IS_BINARY(i, mi, irb);
+		std::tie(op0, op1) = loadOpBinary(mi, irb);
+	    auto* zero = llvm::ConstantInt::get(op0->getType(), 0);
+
+	    llvm::Value* cond = nullptr;
+		switch (i->id)
+	    {
+		    case RISCV_INS_BEQ:    // beqz
+		        cond = irb.CreateICmpSGE(op0, zero);
+			    break;
+			case RISCV_INS_BNE:
+			    cond = irb.CreateICmpNE(op0, zero);
+			    break;
+		    default:
+			    throw GenericError("Unhandled insn ID (2 ops) in translateCondBranch().");
+	    }
+
+	    generateCondBranchFunctionCall(irb, cond, op1);
+	}
+	else if (mi->op_count == 3)
+	{
+		//EXPECT_IS_TERNARY(i, mi, irb);
+		std::tie(op0, op1, op2) = loadOpTernary(mi, irb);
+		op1 = irb.CreateZExtOrTrunc(op1, op0->getType());
+
+		llvm::Value* cond = nullptr;
+		switch (i->id)
+		{
+			case RISCV_INS_BEQ:
+				cond = irb.CreateICmpEQ(op0, op1);
+				break;
+			case RISCV_INS_BNE:
+				cond = irb.CreateICmpNE(op0, op1);
+				break;
+			default:
+				throw GenericError("Unhandled insn ID (3 ops) in translateCondBranch().");
+		}
+
+		generateCondBranchFunctionCall(irb, cond, op2);
+	}
+}
 
 /**
- * RISCV_INS_JAL, RISCV_INS_JALR
+ * RISCV_INS_JAL
  */
 void Capstone2LlvmIrTranslatorRiscv_impl::translateJal(cs_insn* i, cs_riscv* mi, llvm::IRBuilder<>& irb)
 {
-	std::cout << "Generating call function at " << std::hex << i->address << std::dec << std::endl;
-	//EXPECT_IS_UNARY(i, mi, irb);
+	EXPECT_IS_UNARY(i, mi, irb);
 
     std::cout << "Generating call function at " << std::hex << i->address << std::dec << std::endl;
 	storeRegister(RISCV_REG_RA, getNextInsnAddress(i), irb);
@@ -387,23 +441,19 @@ void Capstone2LlvmIrTranslatorRiscv_impl::translateJal(cs_insn* i, cs_riscv* mi,
  */
 void Capstone2LlvmIrTranslatorRiscv_impl::translateJalr(cs_insn* i, cs_riscv* mi, llvm::IRBuilder<>& irb)
 {
-	std::cout << "Generating return function call at " << std::hex << i->address << std::dec << std::endl;
-	//EXPECT_IS_UNARY(i, mi, irb);
+	if (std::string(i->mnemonic) == "ret") {
+	    std::cout << "Generating return function call at " << std::hex << i->address << std::dec << std::endl;
+		generateReturnFunctionCall(irb, op0);
+		return;
+	}
+	EXPECT_IS_UNARY(i, mi, irb);
 
-	// Verify if we need to store RA, because JALR is used for
-	// jr and ret
-	// storeRegister(RISCV_REG_RA, getNextInsnAddress(i), irb);
-
-	// TODO handle jr
-	//op0 = loadOpUnary(mi, irb);
-	std::cout << "Generating return function call at " << std::hex << i->address << std::dec << std::endl;
-	generateReturnFunctionCall(irb, op0);
-    //bool isReturn = mi->operands[0].reg == RISCV_REG_RA;
-
-	//if (isReturn)
-	//    generateReturnFunctionCall(irb, op0);
-	//else
-	//    generateCallFunctionCall(irb, op0);
+	// handle jr
+	// TODO
+	// verify if we need: storeRegister(RISCV_REG_RA, getNextInsnAddress(i), irb);
+	op0 = loadOpUnary(mi, irb);
+	std::cout << "Generating  function call at " << std::hex << i->address << std::dec << std::endl;
+	generateCallFunctionCall(irb, op0);
 }
 
 

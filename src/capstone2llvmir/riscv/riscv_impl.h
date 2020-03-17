@@ -110,8 +110,12 @@ class Capstone2LlvmIrTranslatorRiscv_impl :
 	protected:
 		void translateAdd(cs_insn* i, cs_riscv* mi, llvm::IRBuilder<>& irb);
 		void translateAnd(cs_insn* i, cs_riscv* mi, llvm::IRBuilder<>& irb);
+		void translateAuipc(cs_insn* i, cs_riscv* mi, llvm::IRBuilder<>& irb);
 
 		void translateBreak(cs_insn* i, cs_riscv* mi, llvm::IRBuilder<>& irb);
+
+        //void translateCondBranchBinary(cs_insn* i, cs_riscv* mi, llvm::IRBuilder<>& irb);
+		void translateCondBranch(cs_insn* i, cs_riscv* mi, llvm::IRBuilder<>& irb);
 
 		void translateJal(cs_insn* i, cs_riscv* mi, llvm::IRBuilder<>& irb);
 		void translateJalr(cs_insn* i, cs_riscv* mi, llvm::IRBuilder<>& irb);
