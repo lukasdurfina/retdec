@@ -375,7 +375,8 @@ void Capstone2LlvmIrTranslatorRiscv_impl::translateBreak(cs_insn* i, cs_riscv* m
 }
 
 /**
- * RISCV_INS_BEQ, RISCV_INS_BNE
+ * RISCV_INS_BEQ, RISCV_INS_BNE,
+ * RISCV_INS_BGE, RISCV_INS_BGEU, RISCV_INS_BLT, RISCV_INS_BLTU
  */
 void Capstone2LlvmIrTranslatorRiscv_impl::translateCondBranch(cs_insn* i, cs_riscv* mi, llvm::IRBuilder<>& irb)
 {
@@ -412,6 +413,18 @@ void Capstone2LlvmIrTranslatorRiscv_impl::translateCondBranch(cs_insn* i, cs_ris
 			case RISCV_INS_BEQ:
 				cond = irb.CreateICmpEQ(op0, op1);
 				break;
+			case RISCV_INS_BGE:
+			    cond = irb.CreateICmpSGE(op0, op1);
+			    break;
+			case RISCV_INS_BGEU:
+			    cond = irb.CreateICmpUGE(op0, op1);
+			    break;
+			case RISCV_INS_BLT:
+			    cond = irb.CreateICmpSLT(op0, op1);
+			    break;
+			case RISCV_INS_BLTU:
+			    cond = irb.CreateICmpULT(op0, op1);
+			    break;
 			case RISCV_INS_BNE:
 				cond = irb.CreateICmpNE(op0, op1);
 				break;

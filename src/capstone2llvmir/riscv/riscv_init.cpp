@@ -288,10 +288,10 @@ std::map<std::size_t, void (Capstone2LlvmIrTranslatorRiscv_impl::*)(cs_insn* i, 
         {RISCV_INS_ANDI, &Capstone2LlvmIrTranslatorRiscv_impl::translateAnd},
         {RISCV_INS_AUIPC, &Capstone2LlvmIrTranslatorRiscv_impl::translateAuipc},
         {RISCV_INS_BEQ, &Capstone2LlvmIrTranslatorRiscv_impl::translateCondBranch},
-        {RISCV_INS_BGE, &Capstone2LlvmIrTranslatorRiscv_impl::translateNop},             // TODO
-        {RISCV_INS_BGEU, &Capstone2LlvmIrTranslatorRiscv_impl::translateNop},            // TODO
-        {RISCV_INS_BLT, &Capstone2LlvmIrTranslatorRiscv_impl::translateNop},             // TODO
-        {RISCV_INS_BLTU, &Capstone2LlvmIrTranslatorRiscv_impl::translateNop},            // TODO
+        {RISCV_INS_BGE, &Capstone2LlvmIrTranslatorRiscv_impl::translateCondBranch},
+        {RISCV_INS_BGEU, &Capstone2LlvmIrTranslatorRiscv_impl::translateCondBranch},
+        {RISCV_INS_BLT, &Capstone2LlvmIrTranslatorRiscv_impl::translateCondBranch},
+        {RISCV_INS_BLTU, &Capstone2LlvmIrTranslatorRiscv_impl::translateCondBranch},
         {RISCV_INS_BNE, &Capstone2LlvmIrTranslatorRiscv_impl::translateCondBranch},
         {RISCV_INS_CSRRC, &Capstone2LlvmIrTranslatorRiscv_impl::translateNop},           // TODO
         {RISCV_INS_CSRRCI, &Capstone2LlvmIrTranslatorRiscv_impl::translateNop},          // TODO
